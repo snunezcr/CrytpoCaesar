@@ -1,0 +1,12 @@
+CryptoCaesar: un ejemplo del cifrado Cesar
+------------------------------------------
+
+Este codigo fuente implementa las funciones
+basicas de criptografia del metodo utilizado
+por Julio Cesar para el envio de sus mensajes
+en el annio 70 a.C.
+
+Este programa es parte del proyecto de Arquitectura
+de Computadores, Instituto Tecnologico de Costa
+Rica, Sede Santa Clara.
+
