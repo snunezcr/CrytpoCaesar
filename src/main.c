@@ -22,7 +22,8 @@
 /* Prototipos de funciones */
 void ayuda(const char *);
 int indice(char);
-char caracter(int, int);
+char caracter_en(int, int);
+char caracter_des(int, int);
 int encriptar(const char *, const char *, int);
 int desencriptar(const char *, const char *, int);
 
@@ -88,6 +89,7 @@ int main(int argc, char *argv[]) {
                         return -1;
                 }
 
+		printf("Desencriptando...\n");
                 /* Llame a la funcion desencriptar con los parametros base */
 		return desencriptar(argv[1], argv[2], desplazamiento);
 	} else if (strcmp(argv[3], "-b") == 0) {
@@ -130,11 +132,26 @@ int indice(char c) {
 		return -1;
 }
 
-/* Funcion que dado un valor y un offset, retorna un caracter */
-char caracter(int valor, int desplazamiento) {
-	int posicion = (valor + desplazamiento) % CARS;
-	int columna = posicion / DIM;
-	int fila = posicion % DIM;
+/* Funcion que dado un valor y un offset, retorna un caracter (encripcion) */
+char caracter_en(int valor, int desplazamiento) {
+	int val_columna = valor / DIM;
+	int val_fila = valor % DIM;
+	int off_columna = desplazamiento / DIM;
+	int off_fila = desplazamiento % DIM;
+	int fila = (val_fila + off_fila) % DIM;
+	int columna = (val_columna + off_columna) % DIM;
+
+	return caracteres[fila][columna];
+}
+
+/* Funcion que dado un valor y un offset, retorna un caracter (desencripcion) */
+char caracter_des(int valor, int desplazamiento) {
+	int val_columna = valor / DIM;
+	int val_fila = valor % DIM;
+	int off_columna = desplazamiento % DIM;
+	int off_fila = desplazamiento / DIM;
+	int fila = (DIM + val_fila - off_fila) % DIM;
+	int columna = (DIM + val_columna - off_columna) % DIM;
 
 	return caracteres[fila][columna];
 }
@@ -168,8 +185,8 @@ int encriptar(const char *fin, const char *fout, int desplazamiento) {
 		c = fgetc(entrada);
 		posicion = indice(c);
 		if (posicion != -1) {
-			fputc(caracter(posicion, desplazamiento), salida);
-			printf("%c -> %d -> %c\n", c, posicion, caracter(posicion, desplazamiento));
+			fputc(caracter_en(posicion, desplazamiento), salida);
+			printf("%c -> %d -> %c\n", c, posicion, caracter_en(posicion, desplazamiento));
 		}
 	} while (c != EOF);
 
@@ -187,7 +204,6 @@ int desencriptar(const char *fin, const char *fout, int desplazamiento) {
 	FILE *salida;
 	char c;
 	int posicion;
-	int npos;
 
 	entrada = fopen(fin, "r");
 
@@ -213,9 +229,8 @@ int desencriptar(const char *fin, const char *fout, int desplazamiento) {
 
 		if (posicion != -1) {
 			/* Se calcula la posicion original */
-			npos = (2 * CARS - (posicion + desplazamiento)) % CARS;
-			fputc(caracter(npos, 0), salida);
-			printf("%c -> %d -> %c\n", c, posicion, caracter(npos, 0));
+			fputc(caracter_des(posicion, desplazamiento), salida);
+			printf("%c -> %d -> %c\n", c, posicion, caracter_des(posicion, desplazamiento));
 		}
 	} while (c != EOF);
 
